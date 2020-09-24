@@ -15,7 +15,6 @@ html
       
       .setting
         label.title Playing
-        //- .picker( acp-color="#EFE9E7" acp-show-rgb="no" acp-show-hsl="no" acp-show-hex="yes" acp-show-alpha="no" )
         span.toggle
           input#playToggle( name = 'playing' type = 'checkbox' checked = 'true' )
           label( for = "playToggle" )
@@ -25,26 +24,21 @@ html
       //- .setting
       //-   label.title Spread-x
       //-   input( name = 'spreadx' type = 'range' min = '0' max = '1' step = '0.001' value = '0.6'  )
-      //- .setting
-      //-   label.title Spread-y
-      //-   input( name = 'spready' type = 'range' min = '0' max = '1' step = '0.001' value = '0.2'  )
+      .setting
+        label.title Spread-y
+        input( name = 'spready' type = 'range' min = '0' max = '2' step = '0.001' value = '0.2'  )
       .setting
         label.title Hue
         input( name = 'hue' type = 'range' min = '0' max = '1' step = '0.001' value = '0.2'  )
       .setting
+        label.title Saturation
+        input( name = 'saturation' type = 'range' min = '0' max = '1' step = '0.001' value = '0.9'  )
+      .setting
         label.title Divergence
         input( name = 'divergence' type = 'range' min = '0' max = '0.3' step = '0.001' value = '0.1'  )
-      
-      .setting
-        label.title Preset
-        label 1
-        input( name = 'preset' type = 'radio' checked = 'true' )
-        label 2
-        input( name = 'preset' type = 'radio' )
-        label 3
-        input( name = 'preset' type = 'radio' )
-        label 4
-        input( name = 'preset' type = 'radio' )
+      .setting( style='margin-top:8px')
+        label.title Background
+        input( name = 'bgcolor' type="color" value="#000000" )
       //- .setting
       //-   button Clear
 

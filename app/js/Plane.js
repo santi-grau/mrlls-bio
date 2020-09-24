@@ -29,12 +29,15 @@ class Plane extends Mesh{
         this.spreadx = 0.1 + Math.random() * 2
         this.spready = 0.1 + Math.random() * 1
         this.rotate = ( Math.random( ) > 0.95 )
-        console.log( this.rotate )
+        // this.material.uniforms.opacity.value = 1
+
     }
 
     randomize(){
         this.startx = ( Math.random() - 0.5 ) * 2
         this.starty = ( Math.random() - 0.5 ) * 0.2
+
+        this.material.uniforms.opacity.value = 1
     }
 
     step( time ){
@@ -54,7 +57,7 @@ class Plane extends Mesh{
         this.scale.y = 0.7 + 0.3 * value2d4
         
         
-        // this.material.uniforms.opacity.value = 0.02 + 0.99 * value2d3
+        this.material.uniforms.opacity.value -= ( this.material.uniforms.opacity.value - 0.05 ) * 0.3
 
         this.material.uniforms.time.value = time
     }

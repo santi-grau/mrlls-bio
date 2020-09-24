@@ -14,7 +14,7 @@ class Bars{
         this.renderer = new WebGLRenderer( { antialias : true, alpha : true } )
         this.node.appendChild( this.renderer.domElement )
 
-        // AColorPicker.from('.picker').on('change', (picker, color) => { document.body.style.backgroundColor = color; });
+        AColorPicker.from('.picker').on('change', (picker, color) => { document.body.style.backgroundColor = color; });
 
         this.renderScene = new Scene()
         this.renderCam = new PerspectiveCamera()
@@ -45,6 +45,7 @@ class Bars{
             uniforms : {
                 outt : { value : this.dtPosition },
                 hue : { value : 0 },
+                saturation : { value : 0 },
                 divergence : { value : 0 }
             },
             vertexShader : outShader.vert,
@@ -57,6 +58,8 @@ class Bars{
         var rand = setInterval( () => this.randomize(), 5000 )
         this.setDensity( document.querySelector( 'input[name=density]').value )
         this.setHue( document.querySelector( 'input[name=hue]').value )
+
+        this.setSaturation( document.querySelector( 'input[name=saturation]').value )
         this.setDivergence( document.querySelector( 'input[name=divergence]').value )
         this.onResize()
         this.step( 0 )
@@ -73,8 +76,18 @@ class Bars{
         })
     }
 
+    setSpread( e ){
+        this.renderScene.children.forEach( ( p, i ) => {
+            p.spready = e
+        })
+    }
+
     setHue( e ){
         this.plane.material.uniforms.hue.value = e
+    }
+
+    setSaturation( e ){
+        this.plane.material.uniforms.saturation.value = e
     }
 
     setDivergence( e ){
@@ -126,4 +139,7 @@ var bars = new Bars()
 
 document.querySelector( 'input[name=density]').addEventListener( 'input', ( e ) => bars.setDensity( e.target.value ) )
 document.querySelector( 'input[name=hue]').addEventListener( 'input', ( e ) => bars.setHue( e.target.value) )
+document.querySelector( 'input[name=spready]').addEventListener( 'input', ( e ) => bars.setSpread( e.target.value) )
+document.querySelector( 'input[name=saturation]').addEventListener( 'input', ( e ) => bars.setSaturation( e.target.value) )
 document.querySelector( 'input[name=divergence]').addEventListener( 'input', ( e ) => bars.setDivergence( e.target.value) )
+document.querySelector( 'input[name=bgcolor]').addEventListener( 'input', ( e ) => document.body.style.backgroundColor = e.target.value )

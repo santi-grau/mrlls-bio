@@ -9,7 +9,6 @@ body
     font-size 11px
     background #000000
     color #ffffff
-    transition background 0.4s, color 0.4s
     &.darkmode
         background #ffffff
         color #000000
@@ -55,6 +54,23 @@ input[type=range]
     position relative
     width 127px
     top 4px
+
+input[type="color"]
+	-webkit-appearance none
+	border none
+	width 120px
+	height 12px
+    
+
+input[type="color"]::-webkit-color-swatch-wrapper
+	padding 0
+
+input[type="color"]::-webkit-color-swatch
+	border none
+    
+
+input[type="color" i]
+    padding 1px
 
 input[type=radio]
     position relative
