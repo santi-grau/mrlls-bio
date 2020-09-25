@@ -8,17 +8,11 @@ body
     font-family 'IBM Plex Sans', sans-serif
     font-size 11px
     background #000000
-    color #ffffff
+    color #000000
+    transition color 0.4s
     &.darkmode
-        background #ffffff
-        color #000000
-        button
-            border-color #999999
-            color #000000
-            &:hover
-                border-color #000000
-                background #000000
-                color #ffffff
+        color #ffffff
+    
 #main
     width 100vw
     height 100vh
@@ -43,8 +37,8 @@ button
     display inline-block
     padding 6px 12px
     margin-right 5px
-    border-color #666666
-    color #ffffff
+    border-color inherit
+    color inherit
     &:hover
         border-color #ffffff
         background #ffffff

@@ -1,145 +1,144 @@
-import { Scene, WebGLRenderer, OrthographicCamera, Vector2, PlaneBufferGeometry, MeshBasicMaterial, Mesh, WebGLRenderTarget, PerspectiveCamera, ShaderMaterial } from 'three'
+import { Scene, WebGLRenderer, Color, OrthographicCamera, RGBAFormat, Vector2, PlaneBufferGeometry, MeshBasicMaterial, BoxBufferGeometry, MeshNormalMaterial, Mesh, WebGLRenderTarget, PerspectiveCamera, ShaderMaterial, DataTexture } from 'three'
 import { GPUComputationRenderer } from 'three/examples/jsm/misc/GPUComputationRenderer.js'
+import SimplexNoise from 'simplex-noise'
 import shaderPosition from './feedback.frag'
-const AColorPicker = require('a-color-picker')
 import Plane from './Plane'
-import outShader from './out.*'
+import chroma from 'chroma-js'
 
 class Bars{
     constructor(){
-        
+        this.t = 0
         this.node = document.getElementById( 'main' )
         this.camera = new OrthographicCamera( )
         this.scene = new Scene()
-        this.renderer = new WebGLRenderer( { antialias : true, alpha : true } )
+        this.renderer = new WebGLRenderer( { antialias : true, alpha : true, preserveDrawingBuffer : true } )
         this.node.appendChild( this.renderer.domElement )
-
-        AColorPicker.from('.picker').on('change', (picker, color) => { document.body.style.backgroundColor = color; });
-
-        this.renderScene = new Scene()
-        this.renderCam = new PerspectiveCamera()
-        this.renderTarget = new WebGLRenderTarget( this.node.offsetWidth * 2, this.node.offsetHeight * 2, {  } )
-
-        for( var i = 0 ; i < 32 ; i++ ) this.renderScene.add( new Plane( ) )
-       
-        this.computeSize = new Vector2( this.node.offsetWidth, this.node.offsetHeight )
-        this.gpuCompute = new GPUComputationRenderer( this.computeSize.x, this.computeSize.y, this.renderer )
         
-        this.dtPosition = this.gpuCompute.createTexture()
-        var ps = []
-
-        for( var i = 0 ; i < this.computeSize.x * this.computeSize.y ; i++ ) ps.push( 0,0,0,0 )
-
+        this.renderScene = new Scene()
+        this.renderCam = new OrthographicCamera()
+        this.renderTarget = new WebGLRenderTarget( this.node.offsetWidth, this.node.offsetHeight, {  } )
+       
+        this.computeSize = new Vector2( this.node.offsetWidth * 2, this.node.offsetHeight * 2 )
+        this.gpuCompute = new GPUComputationRenderer( this.computeSize.x, this.computeSize.y, this.renderer )
+        this.dtPosition = this.gpuCompute.createTexture()      
         this.positionVariable = this.gpuCompute.addVariable( 'texturePosition', shaderPosition, this.dtPosition )
-            
         this.gpuCompute.setVariableDependencies( this.positionVariable, [ this.positionVariable ] )
         this.positionUniforms = this.positionVariable.material.uniforms
-
-        this.positionUniforms[ 'time' ] = { value: 0.0 }
-        this.positionUniforms[ 'inScene' ] = { value: null }
-        this.positionUniforms[ 'size' ] = { value: new Vector2( this.computeSize.x, this.computeSize.y ) }
-
-        this.gpuCompute.init()
                                 
-        var pm = new ShaderMaterial({
-            uniforms : {
-                outt : { value : this.dtPosition },
-                hue : { value : 0 },
-                saturation : { value : 0 },
-                divergence : { value : 0 }
-            },
-            vertexShader : outShader.vert,
-            fragmentShader : outShader.frag,
-            transparent : true
-        })
-        this.plane = new Mesh( new PlaneBufferGeometry( 1, 1 ), pm )
+        this.plane = new Mesh( new PlaneBufferGeometry( 1, 1 ), new MeshBasicMaterial({ color : 0xffffff }) )
         this.scene.add( this.plane )
 
-        var rand = setInterval( () => this.randomize(), 5000 )
-        this.setDensity( document.querySelector( 'input[name=density]').value )
-        this.setHue( document.querySelector( 'input[name=hue]').value )
+        this.reset()
 
-        this.setSaturation( document.querySelector( 'input[name=saturation]').value )
-        this.setDivergence( document.querySelector( 'input[name=divergence]').value )
         this.onResize()
         this.step( 0 )
-    }
-
-    randomize(){
-        this.renderScene.children.forEach( p => { if( Math.random() > 0.8 ) p.randomize( ) } )
-    }
-
-    setDensity( e ){
-        this.renderScene.children.forEach( ( p, i ) => {
-            if( i < e ){ p.visible = true } 
-            else { p.visible = false }
-        })
-    }
-
-    setSpread( e ){
-        this.renderScene.children.forEach( ( p, i ) => {
-            p.spready = e
-        })
-    }
-
-    setHue( e ){
-        this.plane.material.uniforms.hue.value = e
-    }
-
-    setSaturation( e ){
-        this.plane.material.uniforms.saturation.value = e
-    }
-
-    setDivergence( e ){
-        this.plane.material.uniforms.divergence.value = e
-    }
+    }   
 
     onResize( ) {
         var [ width, height ] = [ this.node.offsetWidth, this.node.offsetHeight ]
         this.renderer.setSize( width, height )
-		this.renderer.setPixelRatio( window.devicePixelRatio )
+        this.renderer.setPixelRatio( window.devicePixelRatio )
         var camView = { left :  width / -2, right : width / 2, top : height / 2, bottom : height / -2 }
         for ( var prop in camView ) this.camera[ prop ] = camView[ prop ]
+        
         this.camera.position.z = 150
         this.camera.updateProjectionMatrix()
 
-        var camView2 = { fov : 35, aspect : width / height, near : 0.001, far : 1000 }
-        for ( var prop in camView2 ) this.renderCam[ prop ] = camView2[ prop ]
-        this.renderCam.position.set( 0, 0, 3 )
+        for ( var prop in camView ) this.renderCam[ prop ] = camView[ prop ]
+        this.renderCam.position.z = 150
         this.renderCam.updateProjectionMatrix()
 
         this.plane.scale.set( width, height, 1 )
     }
+
+    reset(){
+        this.simplex = new SimplexNoise( Math.random )
+        var ps = []
+        for( var i = 0 ; i < this.computeSize.x * this.computeSize.y ; i++ ) ps.push( 0,0,0,0 )
+        this.dtPosition.image.data = new Float32Array( ps )
+        this.gpuCompute.init()
+        while( this.renderScene.children.length ) this.renderScene.remove( this.renderScene.children[ 0 ] )
+        this.t = 0
+        this.addPlanes()
+    }
+
+    addPlanes(){
+        var ammount = document.querySelector( 'input[name=density]').value
+        for( var i = 0 ; i < ammount ; i++ ){
+            var p = new Plane( i / ammount )
+            p.userData.ride = 0.1 * Math.random()
+            if( Math.random() > ( 1 - document.querySelector( 'input[name=continuity]').value ) ) p.userData.ride = 1
+            this.renderScene.add( p )
+            p.setColor( chroma( document.querySelector( 'input[name=fgcolor]').value ).hsl() )
+        }
+        
+    }
   
     step( time ){
         requestAnimationFrame( ( time ) => this.step( time ) )
-        if( document.querySelector( 'input[name=playing]').checked ){
+
+        this.t = Math.min( 1, this.t + 0.001 ) 
+        if( this.t == 1 ) return 
+
+        document.querySelector( '.stepCount').innerHTML =  ('000' + Math.ceil( this.t * 1000 ) ).slice(-4) + ' / 1000'
+        this.renderScene.children.forEach( ( p, i ) => {
+            p.material.uniforms.opacity.value -= ( p.material.uniforms.opacity.value - document.querySelector( 'input[name=trail]').value ) * 0.3
+            
+            var n = this.simplex.noise2D( ( i + this.t * p.userData.ride ) * 0.5, 0 )
+            var n2 = this.simplex.noise2D( 0, ( i  + this.t * p.userData.ride ) * 0.2 )
+            
+            var n3 = this.simplex.noise2D( 0, -1000 - i - this.t  )
+            var s = document.querySelector( 'input[name=scale]').value
+            p.scale.y = parseFloat( s ) + parseFloat( 1 - s ) * n3
+            var n4 = this.simplex.noise2D( -1000 - i - this.t, 0 )
+
+            p.rotation.z = n4 * Math.PI * 2 * document.querySelector( 'input[name=rotation]').value
+            p.position.x = n * this.node.offsetWidth / 2 * document.querySelector( 'input[name=spreadx]').value
+            p.position.y = n2 * this.node.offsetHeight / 2 * document.querySelector( 'input[name=spready]').value
+
+            p.step( time )
+        } )
+
         
-            this.renderScene.children.forEach( p => p.step( time ) )
+        this.positionUniforms[ 'time' ] = { value: time }
+        this.renderer.setRenderTarget( this.renderTarget )
+        this.renderer.render( this.renderScene, this.renderCam )
 
-            this.positionUniforms[ 'time' ].value += 0.001
-            this.renderer.setRenderTarget( this.renderTarget )
-            this.renderer.render( this.renderScene, this.renderCam )
+        this.positionUniforms[ 'inScene' ] = { value: this.renderTarget.texture }
 
-            this.positionUniforms[ 'inScene' ].value = this.renderTarget.texture
+        this.gpuCompute.compute()
 
-            this.gpuCompute.compute()
-            this.plane.material.uniforms.outt.value = this.gpuCompute.getCurrentRenderTarget( this.positionVariable ).texture
+        this.plane.material.map = this.gpuCompute.getCurrentRenderTarget( this.positionVariable ).texture
+        this.renderer.setRenderTarget( null )
+        
+        this.renderCam.rotation.z = this.t * 0.1
 
-            this.renderer.setRenderTarget( null )
-
-        }
         this.renderer.render( this.scene, this.camera )
+
     }
 }
 
-document.querySelector( 'input[name=hue]').value = Math.random()
 var bars = new Bars()
 
 
-document.querySelector( 'input[name=density]').addEventListener( 'input', ( e ) => bars.setDensity( e.target.value ) )
-document.querySelector( 'input[name=hue]').addEventListener( 'input', ( e ) => bars.setHue( e.target.value) )
-document.querySelector( 'input[name=spready]').addEventListener( 'input', ( e ) => bars.setSpread( e.target.value) )
-document.querySelector( 'input[name=saturation]').addEventListener( 'input', ( e ) => bars.setSaturation( e.target.value) )
-document.querySelector( 'input[name=divergence]').addEventListener( 'input', ( e ) => bars.setDivergence( e.target.value) )
-document.querySelector( 'input[name=bgcolor]').addEventListener( 'input', ( e ) => document.body.style.backgroundColor = e.target.value )
+Object.values( document.querySelectorAll( '.triggerReset' ) ).forEach( t => t.addEventListener( 'change', ( e ) => bars.reset() ) )
+document.querySelector( '.resetBut' ).addEventListener( 'click', ( e ) =>  bars.reset() )
+document.querySelector( 'input[name=bgcolor]').addEventListener( 'input', ( e ) => {
+    document.body.style.backgroundColor = e.target.value
+    document.body.classList.toggle( 'darkmode', ( chroma( e.target.value ).hsl()[ 2 ] < 0.5 ) )
+    var cgl = chroma( e.target.value ).gl()
+    bars.scene.background = new Color( cgl[ 0 ], cgl[ 1 ], cgl[ 2 ] )
+})
+
+document.querySelector( 'input[name=fgcolor]').addEventListener( 'input', ( e ) => {
+    bars.renderScene.children.forEach( p => p.setColor( chroma( e.target.value ).hsl() ) )
+})
+
+
+document.querySelector( '.downloadBut' ).addEventListener( 'click', ( e ) =>  {
+    var image = bars.renderer.domElement.toDataURL('image/png')
+    const a = document.createElement("a")
+    a.href = image.replace(/^data:image\/[^;]/, 'data:application/octet-stream')
+    a.download="image.png"
+    a.click();
+})

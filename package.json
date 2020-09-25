@@ -19,7 +19,7 @@
     "stylus": "^0.54.8"
   },
   "dependencies": {
-    "a-color-picker": "^1.2.1",
+    "chroma-js": "^2.1.0",
     "glsl-curl-noise": "0.0.4",
     "glsl-hsl2rgb": "^1.1.0",
     "glsl-noise": "0.0.0",

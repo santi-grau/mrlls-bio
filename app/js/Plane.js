@@ -1,64 +1,33 @@
-import { PlaneBufferGeometry, MeshBasicMaterial, Mesh, ShaderMaterial } from 'three'
-import SimplexNoise from 'simplex-noise'
+import { PlaneBufferGeometry, Mesh, ShaderMaterial, Vector3 } from 'three'
 import planeShader from './plane.*'
 
 class Plane extends Mesh{
-    constructor(){
+    constructor( index ){
         super()
-        this.geometry = new PlaneBufferGeometry( 0.025, 0.5 )
+        this.index = index
+        this.geometry = new PlaneBufferGeometry( 10, 350 )
 
         this.material = new ShaderMaterial({
             uniforms : {
                 time : { value : null },
-                opacity : { value : 0.05 },
-                hue : { value : 0 }
+                opacity : { value : 0.5 },
+                cin : { value : new Vector3( 0, 0, 1 ) },
+                seed : { value : index * 0.05 },
+                ramp : { value : 0 }
             },
             vertexShader : planeShader.vert,
             fragmentShader : planeShader.frag,
             transparent : true
         })
-
-        this.simplex = new SimplexNoise(Math.random)
-        this.simplex2 = new SimplexNoise(Math.random)
-        this.simplex3 = new SimplexNoise(Math.random)
-        this.simplex4 = new SimplexNoise(Math.random)
-        this.startx = ( Math.random() - 0.5 ) * 2
-        this.starty = ( Math.random() - 0.5 ) * 0.2
-        this.startr = ( Math.random() - 0.5 ) * 0.01 * Math.PI * 2
-        this.position.x = ( Math.random() - 0.5 )
-        this.spreadx = 0.1 + Math.random() * 2
-        this.spready = 0.1 + Math.random() * 1
-        this.rotate = ( Math.random( ) > 0.95 )
-        // this.material.uniforms.opacity.value = 1
-
     }
 
-    randomize(){
-        this.startx = ( Math.random() - 0.5 ) * 2
-        this.starty = ( Math.random() - 0.5 ) * 0.2
-
-        this.material.uniforms.opacity.value = 1
+    setColor( c ){
+        var ramp = document.querySelector( 'input[name=ramp]').value * this.index
+        this.material.uniforms.cin.value = new Vector3( c[ 0 ] / 360 + ramp, c[ 1 ], c[ 2 ] )
     }
 
     step( time ){
-
-        var value2d = this.simplex.noise2D( 0, time * 0.0001 ) * 0.3
-        this.position.x = this.startx + value2d * this.spreadx
-        var value2d2 = this.simplex2.noise2D( 0, time * 0.0001 ) * 0.3
         
-        this.position.y = this.starty + value2d2 * this.spready
-        
-
-        var value2d3 = this.simplex3.noise2D( 0, time * 0.0001 ) * 0.1
-        this.rotation.z = this.startr
-        if( this.rotate ) this.rotation.z = this.startr + value2d3 * Math.PI * 2
-
-        var value2d4 = this.simplex3.noise2D( 0, time * 0.0001 ) * 0.6
-        this.scale.y = 0.7 + 0.3 * value2d4
-        
-        
-        this.material.uniforms.opacity.value -= ( this.material.uniforms.opacity.value - 0.05 ) * 0.3
-
         this.material.uniforms.time.value = time
     }
 }
