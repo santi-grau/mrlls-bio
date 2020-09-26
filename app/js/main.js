@@ -76,13 +76,17 @@ class Bars{
   
     step( time ){
         requestAnimationFrame( ( time ) => this.step( time ) )
-
-        this.t = Math.min( 1, this.t + 0.001 ) 
+        var speed = document.querySelector( 'input[name=speed]').value
+        this.t = Math.min( 1, this.t + 0.001 * speed ) 
         if( this.t == 1 ) return 
 
-        document.querySelector( '.stepCount').innerHTML =  ('000' + Math.ceil( this.t * 1000 ) ).slice(-4) + ' / 1000'
+        var perc = 0
+        var p = Math.ceil( this.t * 100 )
+        if( p < 100 ) perc = ( '00' + p ).slice(-2)
+        else perc = 100
+        document.querySelector( '.stepCount').innerHTML =  perc + ' %'
         this.renderScene.children.forEach( ( p, i ) => {
-            p.material.uniforms.opacity.value -= ( p.material.uniforms.opacity.value - document.querySelector( 'input[name=trail]').value ) * 0.3
+            p.material.uniforms.opacity.value -= ( p.material.uniforms.opacity.value - document.querySelector( 'input[name=trail]').value * speed ) * 0.3
             
             var n = this.simplex.noise2D( ( i + this.t * p.userData.ride ) * 0.5, 0 )
             var n2 = this.simplex.noise2D( 0, ( i  + this.t * p.userData.ride ) * 0.2 )
