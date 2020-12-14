@@ -1,18 +1,28 @@
 import { Scene, WebGLRenderer, OrthographicCamera, Vector2, PlaneBufferGeometry, MeshBasicMaterial, Mesh, WebGLRenderTarget, PerspectiveCamera, ShaderMaterial } from 'three'
 import { GPUComputationRenderer } from 'three/examples/jsm/misc/GPUComputationRenderer.js'
-import shaderPosition from './feedback.frag'
+import shaderPosition from './shaders/feedback.frag'
 const AColorPicker = require('a-color-picker')
 import Plane from './Plane'
-import outShader from './out.*'
+import outFS from './shaders/out.frag'
+import baseVS from './shaders/base.vert'
+import { uniqueNamesGenerator, Config, adjectives, colors, animals } from 'unique-names-generator'
+import seedrandom from 'seedrandom'
 
 class Bars{
-    constructor(){
-        
+    constructor( seed = null ){
         this.node = document.getElementById( 'main' )
+
+        if( window.location.hash ) this.seed = window.location.hash.substring(1)
+        else this.seed = uniqueNamesGenerator( { dictionaries: [adjectives, colors, animals ], separator: '' } )
+        console.log( this.seed )
         this.camera = new OrthographicCamera( )
         this.scene = new Scene()
         this.renderer = new WebGLRenderer( { antialias : true, alpha : true } )
         this.node.appendChild( this.renderer.domElement )
+        
+        this.rng = seedrandom( this.seed )
+        document.querySelector( 'input[name=hue]').value = this.rng()
+        document.querySelector( 'input[name=density]').value = 8 + Math.round( this.rng() * 8 )
 
         AColorPicker.from('.picker').on('change', (picker, color) => { document.body.style.backgroundColor = color; });
 
@@ -20,7 +30,7 @@ class Bars{
         this.renderCam = new PerspectiveCamera()
         this.renderTarget = new WebGLRenderTarget( this.node.offsetWidth * 2, this.node.offsetHeight * 2, {  } )
 
-        for( var i = 0 ; i < 32 ; i++ ) this.renderScene.add( new Plane( ) )
+        for( var i = 0 ; i < 32 ; i++ ) this.renderScene.add( new Plane( this.seed + i ) )
        
         this.computeSize = new Vector2( this.node.offsetWidth, this.node.offsetHeight )
         this.gpuCompute = new GPUComputationRenderer( this.computeSize.x, this.computeSize.y, this.renderer )
@@ -48,8 +58,8 @@ class Bars{
                 saturation : { value : 0 },
                 divergence : { value : 0 }
             },
-            vertexShader : outShader.vert,
-            fragmentShader : outShader.frag,
+            vertexShader : baseVS,
+            fragmentShader : outFS,
             transparent : true
         })
         this.plane = new Mesh( new PlaneBufferGeometry( 1, 1 ), pm )
@@ -94,6 +104,21 @@ class Bars{
         this.plane.material.uniforms.divergence.value = e
     }
 
+    exportImage(){
+        document.querySelector( 'input[name=playing]').checked = false
+        
+        
+        this.renderer.setPixelRatio( 4 )
+        this.renderer.render( this.scene, this.camera )
+
+        var a = document.createElement( 'a' )
+        a.href = this.renderer.domElement.toDataURL().replace( 'image/png', 'image/octet-stream' )
+        a.download = 'export.png'
+        a.click()
+
+        this.onResize()
+    }
+
     onResize( ) {
         var [ width, height ] = [ this.node.offsetWidth, this.node.offsetHeight ]
         this.renderer.setSize( width, height )
@@ -133,9 +158,8 @@ class Bars{
     }
 }
 
-document.querySelector( 'input[name=hue]').value = Math.random()
-var bars = new Bars()
 
+var bars = new Bars( )
 
 document.querySelector( 'input[name=density]').addEventListener( 'input', ( e ) => bars.setDensity( e.target.value ) )
 document.querySelector( 'input[name=hue]').addEventListener( 'input', ( e ) => bars.setHue( e.target.value) )
@@ -143,3 +167,11 @@ document.querySelector( 'input[name=spready]').addEventListener( 'input', ( e ) 
 document.querySelector( 'input[name=saturation]').addEventListener( 'input', ( e ) => bars.setSaturation( e.target.value) )
 document.querySelector( 'input[name=divergence]').addEventListener( 'input', ( e ) => bars.setDivergence( e.target.value) )
 document.querySelector( 'input[name=bgcolor]').addEventListener( 'input', ( e ) => document.body.style.backgroundColor = e.target.value )
+document.querySelector( '.exportPNG').addEventListener( 'click', ( e ) => bars.exportImage() )
+
+document.querySelector( 'input[name=name]').addEventListener( 'keydown', e => {
+    if (e.keyCode == 13) { 
+        window.location = '#' + e.target.value
+        location.reload()
+    }
+}, false)

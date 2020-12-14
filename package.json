@@ -23,7 +23,9 @@
     "glsl-curl-noise": "0.0.4",
     "glsl-hsl2rgb": "^1.1.0",
     "glsl-noise": "0.0.0",
+    "seedrandom": "^3.0.5",
     "simplex-noise": "^2.4.0",
-    "three": "*"
+    "three": "*",
+    "unique-names-generator": "^4.3.1"
   }
 }

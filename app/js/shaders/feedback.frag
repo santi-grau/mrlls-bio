@@ -13,7 +13,7 @@ void main()	{
     vec4 inp = texture2D( inScene, uv );
     vec4 position = texture2D( texturePosition, uv );
     float n = ( 1.0 + snoise2( vec2( uv.x * 10.10, time * 10.0 ) ) ) * 0.5 ;
-    vec4 color = ( inp * ( n ) + position * 0.999 ) ;
+    vec4 color = ( inp * clamp( n, 0.0, 0.5 ) + position * 0.991 ) ;
 
     gl_FragColor = color;
 }

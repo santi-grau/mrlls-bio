@@ -9,8 +9,6 @@ html
     link(rel='stylesheet', id='mainStylesheet' href='../css/main.styl')
   body
     #main
-
-
     #settings
       
       .setting
@@ -18,6 +16,9 @@ html
         span.toggle
           input#playToggle( name = 'playing' type = 'checkbox' checked = 'true' )
           label( for = "playToggle" )
+      .setting
+        label.title Name
+        input( name = 'name' type = 'text'  )
       .setting
         label.title Density
         input( name = 'density' type = 'range' min = '0' max = '32' step = '1' value = '8'  )
@@ -39,7 +40,7 @@ html
       .setting( style='margin-top:8px')
         label.title Background
         input( name = 'bgcolor' type="color" value="#000000" )
-      //- .setting
-      //-   button Clear
+      .setting
+        button.exportPNG Export PNG
 
     script(src='../js/main.js')

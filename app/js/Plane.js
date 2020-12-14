@@ -1,41 +1,48 @@
 import { PlaneBufferGeometry, MeshBasicMaterial, Mesh, ShaderMaterial } from 'three'
 import SimplexNoise from 'simplex-noise'
-import planeShader from './plane.*'
+import planeFS from './shaders/plane.frag'
+import baseVS from './shaders/base.vert'
+
+import seedrandom from 'seedrandom'
 
 class Plane extends Mesh{
-    constructor(){
+    constructor( seed ){
         super()
-        this.geometry = new PlaneBufferGeometry( 0.025, 0.5 )
 
+        this.rng = seedrandom( seed )
+
+        this.geometry = new PlaneBufferGeometry( 0.025, 0.5 )
+        
         this.material = new ShaderMaterial({
             uniforms : {
                 time : { value : null },
                 opacity : { value : 0.05 },
                 hue : { value : 0 }
             },
-            vertexShader : planeShader.vert,
-            fragmentShader : planeShader.frag,
+            vertexShader : baseVS,
+            fragmentShader : planeFS,
             transparent : true
         })
 
-        this.simplex = new SimplexNoise(Math.random)
-        this.simplex2 = new SimplexNoise(Math.random)
-        this.simplex3 = new SimplexNoise(Math.random)
-        this.simplex4 = new SimplexNoise(Math.random)
-        this.startx = ( Math.random() - 0.5 ) * 2
-        this.starty = ( Math.random() - 0.5 ) * 0.2
-        this.startr = ( Math.random() - 0.5 ) * 0.01 * Math.PI * 2
-        this.position.x = ( Math.random() - 0.5 )
-        this.spreadx = 0.1 + Math.random() * 2
-        this.spready = 0.1 + Math.random() * 1
-        this.rotate = ( Math.random( ) > 0.95 )
+        this.simplex = new SimplexNoise(seed)
+        this.simplex2 = new SimplexNoise(seed)
+        this.simplex3 = new SimplexNoise(seed)
+        this.simplex4 = new SimplexNoise(seed)
+        this.startx = ( this.rng() - 0.5 ) * 2
+        this.starty = ( this.rng() - 0.5 ) * 0.2
+        this.startr = ( this.rng() - 0.5 ) * 0.01 * Math.PI * 2
+        this.position.x = ( this.rng() - 0.5 )
+        this.spreadx = 0.1 + this.rng() * 2
+        this.spready = 0.1 + this.rng() * 1
+        this.rotate = ( this.rng() > 0.95 )
         // this.material.uniforms.opacity.value = 1
 
     }
 
     randomize(){
-        this.startx = ( Math.random() - 0.5 ) * 2
-        this.starty = ( Math.random() - 0.5 ) * 0.2
+        
+        this.startx = ( this.rng() - 0.5 ) * 2
+        this.starty = ( this.rng() - 0.5 ) * 0.2
 
         this.material.uniforms.opacity.value = 1
     }
