@@ -9,8 +9,5 @@ varying vec2 vUv;
 
 void main()	{
     float n = ( 1.0 + snoise3( vec3( vUv.x * 1000.0, vUv.y * 1000.0, time ) ) ) * 0.5 ;
-    
-
-
     gl_FragColor = vec4( hsl2rgb( cin.x, cin.y, cin.z ), opacity * n );
 }
