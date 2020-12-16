@@ -7,6 +7,11 @@ import chroma from 'chroma-js'
 import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator'
 import seedrandom from 'seedrandom'
 
+var event = new Event('input', {
+    bubbles: true,
+    cancelable: true,
+})
+
 class Bars{
     constructor( seed = null ){
         if( window.location.hash ) {
@@ -33,13 +38,21 @@ class Bars{
         this.positionVariable = this.gpuCompute.addVariable( 'texturePosition', shaderPosition, this.dtPosition )
         this.gpuCompute.setVariableDependencies( this.positionVariable, [ this.positionVariable ] )
         this.positionUniforms = this.positionVariable.material.uniforms
-                                
+        Object.values( document.querySelectorAll( '.valueShow' ) ).forEach( e => {
+            e.value = e.previousSibling.value
+            e.addEventListener( 'input', ( v ) => { 
+                e.previousSibling.value = v.target.value 
+                this.reset()
+            } )
+            e.previousSibling.addEventListener( 'input', ( ) => { e.value = e.previousSibling.value } )
+        } )
         this.plane = new Mesh( new PlaneBufferGeometry( 1, 1 ), new MeshBasicMaterial({ color : 0xffffff }) )
         this.scene.add( this.plane )
 
         document.body.addEventListener( 'dragover', ( e ) => e.preventDefault(), false)
         document.body.addEventListener('drop', ( e ) => this.onDrop( e ), false )
-
+        document.querySelector( 'input[name=fgcolor]').addEventListener( 'change', ( e ) => this.reset() )
+        
         this.reset()
 
         this.onResize()
@@ -54,7 +67,7 @@ class Bars{
     onResize( ) {
         var [ width, height ] = [ this.node.offsetWidth, this.node.offsetHeight ]
         this.renderer.setSize( width, height )
-        this.renderer.setPixelRatio( window.devicePixelRatio )
+        this.renderer.setPixelRatio( 1 )
         var camView = { left :  width / -2, right : width / 2, top : height / 2, bottom : height / -2 }
         for ( var prop in camView ) this.camera[ prop ] = camView[ prop ]
         
@@ -131,7 +144,7 @@ class Bars{
         this.t = this.t + 0.01 * speed
 
         this.renderScene.children.forEach( ( p, i ) => {
-            p.material.uniforms.opacity.value -= ( p.material.uniforms.opacity.value - document.querySelector( 'input[name=trail]').value * speed * 10 ) * 0.3
+            p.material.uniforms.opacity.value -= ( p.material.uniforms.opacity.value - (document.querySelector( 'input[name=trail]').value/40) * speed * 10 ) * 0.3
             
             var n = this.simplex.noise2D( ( i + this.t * p.userData.ride ) * 0.4, 0 )
             var n2 = this.simplex.noise2D( 0, ( i  + this.t * p.userData.ride ) * 0.2 )
@@ -184,6 +197,10 @@ document.querySelector( 'input[name=fgcolor]').addEventListener( 'input', ( e ) 
 
 document.querySelector( '.downloadBut' ).addEventListener( 'click', ( e ) =>  {
     bars.exportImage()
+})
+
+document.querySelector( '.resetBut' ).addEventListener( 'click', ( e ) =>  {
+    bars.reset()
 })
 
 document.querySelector( '.saveBut' ).addEventListener( 'click', ( e ) =>  {
