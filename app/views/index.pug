@@ -9,10 +9,22 @@ html
     link(rel='stylesheet', id='mainStylesheet' href='../css/main.styl')
   body.darkmode
     #main
+    #captureProgress
+      .inner
+        .title Exporting to video
+        .progress
+          span.name Capturing Frames
+          span.bar
+            .perc.capturing
+        .progress
+          .name Encoding Video
+          span.bar
+            .perc.encoding
+
     #settings
       .setting
         label.title Name
-        input.exportable( name = 'name' type = 'text'  )
+        input.exportable( name = 'name' type = 'text' autocomplete='off' autocorrect='off' autocapitalize='off' spellcheck='false' )
       .setting
         label.title Density
         input.triggerReset.exportable( name = 'density' type = 'range' min = '1' max = '32' step = '1' value = '12'  )
@@ -41,11 +53,11 @@ html
         label.title Trail Opacity
         input.exportable( name = 'trail' type = 'range' min = '0' max = '1' step = '0.001' value = '0.35'  )
         input.valueShow
-      .setting( style='margin-top:8px')
+      .setting
         label.title Background
-        input.exportable( name = 'bgcolor' type="color" value="#000000" )
+        input.exportable( name = 'bgcolor' type="color" value="#111111" )
         input.valueShow
-      .setting( style='margin-top:8px')
+      .setting
         label.title Color
         input.exportable( name = 'fgcolor' type="color" value="#ff0000" )
         input.valueShow
@@ -53,10 +65,31 @@ html
         label.title Hue Ramp
         input.triggerReset.exportable( name = 'ramp' type = 'range' min = '0' max = '1' step = '0.001' value = '0.1'  )
         input.valueShow
-
-    #botButs
-      button.resetBut Reset
-      button.downloadBut Export
-      button.saveBut Save settings
+      .setting
+        label.title Aspect ratio
+        input( name = 'op' value = 0 type = 'radio' checked = 'checked' )
+        label.ratioLabel Free
+        input( name = 'op' value = '16_9' type = 'radio' )
+        label.ratioLabel 16:9
+        input( name = 'op' value = '9_16' type = 'radio' )
+        label.ratioLabel 9:16
+      .setting
+        label.title
+        input( name = 'op' value = '4_3' type = 'radio' )
+        label.ratioLabel 4:3
+        input( name = 'op' value = '3_4' type = 'radio' )
+        label.ratioLabel 3:4
+        input( name = 'op' value = '1_1' type = 'radio' )
+        label.ratioLabel 1:1
+      .setting
+        label.title 
+        input( name = 'op' value = 'custom' type = 'radio' )
+        span #[input.ratioInput( name = 'rWidth' value = 1 type = 'text' )] : #[input.ratioInput( name = 'rHeight' value = 1 type = 'text' )]
+      #botButs
+        button.resetBut Reset
+        button.saveBut Save settings
+        button.downloadBut Export PNG
+        button.exportVideoBut Export Video
+      
 
     script(src='../js/main.js')

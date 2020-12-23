@@ -27,7 +27,6 @@ class Plane extends Mesh{
     }
 
     step( time ){
-        
         this.material.uniforms.time.value = time
     }
 }
