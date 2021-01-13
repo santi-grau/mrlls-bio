@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "parcel app/views/index.pug",
-    "build": "rm -rf docs && parcel build app/views/index.pug --no-source-maps --out-dir docs --public-url '.'"
+    "player": "parcel app/views/player.pug",
+    "build": "rm -rf docs && parcel build app/views/index.pug --no-source-maps --out-dir docs --public-url '.'",
+    "buildplayer": "rm -rf player && parcel build app/views/player.pug --no-source-maps --out-dir player --public-url '.'"
   },
   "keywords": [],
   "author": "proper-code",

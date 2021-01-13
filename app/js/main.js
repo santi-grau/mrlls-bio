@@ -160,7 +160,7 @@ class Bars{
             p.userData.ride = 0.1 * this.rng()
             if( this.rng() > ( 1 - document.querySelector( 'input[name=continuity]').value ) ) p.userData.ride = 1
             this.renderScene.add( p )
-            p.setColor( chroma( document.querySelector( 'input[name=fgcolor]').value ).hsl() )
+            p.setColor( chroma( document.querySelector( 'input[name=fgcolor]').value ).hsl(), document.querySelector( 'input[name=ramp]').value )
         }
     }
 
@@ -194,7 +194,7 @@ class Bars{
             var n3 = this.simplex.noise2D( 0, -1000 - i - this.t  )
 
             var s = document.querySelector( 'input[name=scale]').value
-            // p.scale.y = parseFloat( s ) + parseFloat( 1 - s ) * n3
+            p.scale.y = parseFloat( s ) + parseFloat( 1 - s ) * n3
             
             var n4 = this.simplex.noise2D( -1000 - i - this.t, 0 )
             p.rotation.z = n4 * Math.PI * 0.1 * document.querySelector( 'input[name=rotation]').value
@@ -237,7 +237,7 @@ document.querySelector( 'input[name=bgcolor]').addEventListener( 'input', ( e ) 
 Object.values( document.querySelectorAll( 'input[name=op]' ) ).forEach( s => { s.addEventListener( 'input', ( e ) => bars.setRatio( e.target.value ) ) })
 document.querySelector( 'input[name=fgcolor]').addEventListener( 'input', ( e ) => { bars.renderScene.children.forEach( p => p.setColor( chroma( e.target.value ).hsl() ) ) } )
 document.querySelector( '.downloadBut' ).addEventListener( 'click', ( e ) =>  { 
-    exportImage( ) 
+    exportImage( bars.renderer, bars.scene, bars.camera ) 
     bars.onResize()
 } )
 document.querySelector( '.exportVideoBut' ).addEventListener( 'click', ( e ) =>  { bars.startVideoExport() } )

@@ -21,9 +21,8 @@ class Plane extends Mesh{
         })
     }
 
-    setColor( c ){
-        var ramp = document.querySelector( 'input[name=ramp]').value * this.index
-        this.material.uniforms.cin.value = new Vector3( c[ 0 ] / 360 + ramp, c[ 1 ], c[ 2 ] )
+    setColor( c, ramp ){
+        this.material.uniforms.cin.value = new Vector3( c[ 0 ] / 360 + ramp * this.index, c[ 1 ], c[ 2 ] )
     }
 
     step( time ){
