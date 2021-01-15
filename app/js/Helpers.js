@@ -34,7 +34,7 @@ const importSettings = ( d ) => {
 }
 
 const exportImage = ( renderer, scene, camera ) => {
-    renderer.setPixelRatio( 4 )
+    renderer.setPixelRatio( 3 )
     renderer.render( scene, camera )
     var a = document.createElement( 'a' )
     a.href = renderer.domElement.toDataURL().replace( 'image/png', 'image/octet-stream' )

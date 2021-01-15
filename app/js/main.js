@@ -114,7 +114,7 @@ class Bars{
         this.renderer.setPixelRatio( 1 )
         var camView = { left :  width / -2, right : width / 2, top : height / 2, bottom : height / -2 }
         for ( var prop in camView ) this.camera[ prop ] = camView[ prop ]
-        
+        console.log( this.camera )
         this.camera.position.z = 150
         this.camera.updateProjectionMatrix()
 
@@ -123,7 +123,7 @@ class Bars{
         this.renderCam.updateProjectionMatrix()
 
         this.plane.scale.set( width, height, 1 )
-        if( this.bg ) this.bg.scale.set( width, height, 1 )
+        if( this.bg ) this.bg.scale.set( width * 10, height * 10, 1 )
     }
 
     onDrop( e ){
