@@ -1,13 +1,18 @@
 BIOSYSTEMS
 ======
 
-Biosystems repository. Contains the Biosystems player at ./player directory.
+Biosystems repository. Contains the Biosystems player at ./player directory and generative tool.
 
 Example provided at ./player/player.html
 
 ![Image](./player/weird-faithful.png)
 
-Basic usage
+Hosting the generative tool
+-------------
+
+Copy files from ./docs onto web server
+
+Player usage
 -------------
 
 Include the library located at: ./player/player.js at the end of your HTML's body.
