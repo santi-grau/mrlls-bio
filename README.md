@@ -12,6 +12,21 @@ Hosting the generative tool
 
 Copy files from ./docs onto web server
 
+
+
+
+
+
+Run local
+-------------
+
+* Install Node and NPM ( https://nodejs.org/en/ ) 🙏
+
+* $ npm i && npm start
+
+* Open Google Chrome at localhost:1234
+
+
 Player usage
 -------------
 

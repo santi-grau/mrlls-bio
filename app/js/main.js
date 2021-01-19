@@ -132,7 +132,7 @@ class Bars{
         if( ext == 'json' ) {
             reader.readAsText( file )
             reader.onloadend = ( e ) => { if( ext == 'json' ) importSettings( JSON.parse( reader.result ) ) }
-            bars.reset()
+            setTimeout( () => bars.reset(), 100 )
         }
     }
 
@@ -145,6 +145,13 @@ class Bars{
         while( this.renderScene.children.length ) this.renderScene.remove( this.renderScene.children[ 0 ] )
         this.t = 0
         this.addPlanes()
+
+        var bc = document.querySelector( 'input[name=bgcolor]').value
+        document.body.style.backgroundColor = bc
+        document.body.classList.toggle( 'darkmode', ( chroma( bc ).hsl()[ 2 ] < 0.5 ) )
+        var cgl = chroma( bc ).gl()
+        if( this.bg ) this.bg.material.color = new Color( cgl[ 0 ], cgl[ 1 ], cgl[ 2 ] )
+        
 
         this.renderScene.children.forEach( ( p, i ) => {
             p.scale.y = this.node.offsetHeight / 800
