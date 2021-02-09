@@ -32,6 +32,11 @@ body
             border solid 1px #aaaaaa
             &:checked
                 background #dedede
+        .toggle
+            label
+                border solid 1px #aaaaaa
+            label:after
+                background #dedede
     
 #main
     width 100vw
@@ -272,6 +277,7 @@ input[type=text]
     position relative
     left -5px
     top 5px
+    
     input
         height 0
         width 0
@@ -285,6 +291,8 @@ input[type=text]
         display inline-block
         border-radius 100px
         position relative
+        border solid 1px #666666
+        background none
 
     label:after
         content ''
@@ -293,7 +301,7 @@ input[type=text]
         left 1px
         width 13px
         height 13px
-        background #fff
+        background #000000
         border-radius 13px
         transition 0.3s
 
@@ -302,7 +310,7 @@ input[type=text]
         transform translateX(-100%)
 
     input:checked + label
-        background #0000ff
+        background none
 
 .valueShow
     -webkit-appearance none

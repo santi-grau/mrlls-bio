@@ -114,7 +114,7 @@ class Bars{
         this.renderer.setPixelRatio( 1 )
         var camView = { left :  width / -2, right : width / 2, top : height / 2, bottom : height / -2 }
         for ( var prop in camView ) this.camera[ prop ] = camView[ prop ]
-        console.log( this.camera )
+        
         this.camera.position.z = 150
         this.camera.updateProjectionMatrix()
 
@@ -248,7 +248,7 @@ document.querySelector( '.downloadBut' ).addEventListener( 'click', ( e ) =>  {
     bars.onResize()
 } )
 document.querySelector( '.exportVideoBut' ).addEventListener( 'click', ( e ) =>  { bars.startVideoExport() } )
-
+document.querySelector( '#transparentToggle').addEventListener( 'input', ( e ) => console.log( bars.bg.visible = !e.target.checked ) )
 document.querySelector( '.resetBut' ).addEventListener( 'click', ( e ) =>  { bars.reset() } )
 document.querySelector( '.saveBut' ).addEventListener( 'click', ( e ) =>  { exportSettings() } )
 document.querySelector( 'input[name=rWidth]').addEventListener( 'input', ( ) => bars.updateCustomRatio( ) )
