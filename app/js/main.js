@@ -65,6 +65,9 @@ class Bars{
             quality : 99
         } )
 
+
+        
+
         this.onResize()
         this.step( 0 )
     }
@@ -182,7 +185,19 @@ class Bars{
 
     stopVideoExport(){
         this.capturer.stop()
-        this.capturer.save( blob => transcode( new File([blob], 'file_name', { lastModified : new Date().getTime() } ) ) )
+        this.capturer.save( blob => {
+            const blobUrl = URL.createObjectURL( blob, { type: 'video/webm' } )
+            const link = document.createElement( 'a' )
+            link.href = blobUrl
+            link.download = uniqueNamesGenerator( { dictionaries: [adjectives, adjectives ], separator: '-' } ) + '.webm'
+            document.body.appendChild( link )
+            link.dispatchEvent( new MouseEvent('click', { bubbles: true, cancelable: true, view: window } ) )
+            document.body.removeChild( link )
+            // transcode( new File([blob], 'file_name', { lastModified : new Date().getTime() } ) ) 
+        })
+
+        document.body.classList.remove( 'recording' )
+        
         this.capturing = false
         console.log('done')
         this.exporting = true
